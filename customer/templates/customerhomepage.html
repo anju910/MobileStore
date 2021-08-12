@@ -4,6 +4,17 @@
 <div class="text-center"><h2>Choose From Here</h2></div>
 <div class="container">
     <div class="row">
+        <div class="col-12 text-center">
+            {%if messages%}
+                {%for message in messages%}
+                    {{message}}
+                {%endfor%}
+            {%endif%}
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div class="row">
         {%for mobile in mobiles%}
 <!--        <div class="">-->
             <div class="card ms-5 mt-3" style="width: 12rem;">
@@ -16,7 +27,7 @@
                     <li class="list-group-item">{{mobile.specs}}</li>
                 </ul>
                 <div class="card-body">
-                    <a href="{%url 'productdetail' mobile.id%}" class="btn btn-primary">AddToCart</a>
+                    <a href="{%url 'productdetail' mobile.id%}" class="btn btn-primary">BuyNow</a>
                 </div>
             </div>
 <!--        </div>-->

@@ -100,12 +100,13 @@ def mobile_update(request,id):
     context={}
     context["form"]=form
     if request.method=="POST":
-        form=MobileCreationForm(data=request.POST,files=request.FILES,instance=mobile)
+        form=MobileCreationForm(request.POST,files=request.FILES,instance=mobile)
         if form.is_valid():
             form.save()
             return redirect("listmobiles")
         else:
-            return render(request,"owner/mobile_edit.html",{"form":form})
+            context["form"] = form
+            return render(request,"owner/mobile_edit.html",context)
     return render(request,"owner/mobile_edit.html",context)
 
 def mobile_detail(request,id):

@@ -4,7 +4,8 @@ from django.contrib.auth import authenticate,login,logout
 from django.views.generic import TemplateView,ListView,DeleteView
 from django.contrib.auth.models import User
 from owner.models import Mobile
-
+from customer.models import Cart
+from django.contrib import messages
 # Create your views here.
 class RegistrationView(TemplateView):
     form_class=forms.RegistrationForm
@@ -55,6 +56,23 @@ class ProductDetail(DeleteView):
     context_object_name = "mobile"
     pk_url_kwarg = 'pk'
 
+
+
+class AddCartView(TemplateView):
+    model=Cart
+    def get(self, request, *args, **kwargs):
+        product_id=kwargs["id"]
+        product=Mobile.objects.get(id=product_id)
+        user=request.user
+        cart=Cart(product=product,user=user)
+        cart.save()
+        messages.success(request,"Added to cart")
+        return redirect("customerhome")
+
+class ViewCart(ListView):
+    model = Cart
+    template_name = "cart_detail.html"
+    context_object_name = "items"
 
 class SignOutView(TemplateView):
     def get(self, request, *args, **kwargs):
