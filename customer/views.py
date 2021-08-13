@@ -1,10 +1,10 @@
 from django.shortcuts import render,redirect
 from customer import forms
 from django.contrib.auth import authenticate,login,logout
-from django.views.generic import TemplateView,ListView,DeleteView
+from django.views.generic import TemplateView,ListView,DetailView,DeleteView,CreateView
 from django.contrib.auth.models import User
 from owner.models import Mobile
-from customer.models import Cart
+from customer.models import Cart,Orders
 from django.contrib import messages
 # Create your views here.
 class RegistrationView(TemplateView):
@@ -50,7 +50,7 @@ class CustomerHome(ListView):
     model = Mobile
     context_object_name = "mobiles"
 
-class ProductDetail(DeleteView):
+class ProductDetail(DetailView):
     template_name = "product_detail.html"
     model = Mobile
     context_object_name = "mobile"
@@ -73,6 +73,64 @@ class ViewCart(ListView):
     model = Cart
     template_name = "cart_detail.html"
     context_object_name = "items"
+
+    def get_queryset(self):
+        queryset=self.model.objects.filter(user=self.request.user,status="in_cart")
+        return queryset
+
+class CartRemove(DeleteView):
+    model = Cart
+    def get(self, request, *args, **kwargs):
+        cart_id=kwargs["c_id"]
+        cart=Cart.objects.get(id=cart_id)
+        cart.delete()
+        return redirect("cartdetails")
+
+
+class OrderView(CreateView):
+    template_name = "order_place.html"
+    form_class = forms.OrderForm
+    model = Orders
+    def post(self, request, *args, **kwargs):
+        form=self.form_class(request.POST)
+        if form.is_valid():
+            order=form.save(commit=False)
+            cart_id=kwargs["c_id"]
+            product_id=kwargs["p_id"]
+            cart=Cart.objects.get(id=cart_id)
+            product=Mobile.objects.get(id=product_id)
+            order.product=product
+            order.user=request.user
+            order.save()
+            cart.status="order_placed"
+            cart.save()
+            return redirect("customerhome")
+
+
+class MyOrders(ListView):
+    template_name = "myorders.html"
+    context_object_name = "orders"
+    model = Orders
+    def get_queryset(self):
+        queryset=self.model.objects.filter(user=self.request.user)
+        return queryset
+
+class OrderRemove(DeleteView):
+    model = Orders
+    def get(self, request, *args, **kwargs):
+        order_id=kwargs["o_id"]
+        order=Orders.objects.get(id=order_id)
+        order.delete()
+        return redirect("myorder")
+
+
+class OrderDetail(DetailView):
+    template_name = "order_detail.html"
+    model = Orders
+    context_object_name = "order"
+    pk_url_kwarg = 'pk'
+
+
 
 class SignOutView(TemplateView):
     def get(self, request, *args, **kwargs):

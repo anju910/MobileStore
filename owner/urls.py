@@ -13,6 +13,6 @@ urlpatterns=[
     path('mobiles/',views.mobile_list,name="listmobiles"),
     path('mobiles/change/<int:id>',views.mobile_update,name="changemobiles"),
     path('mobiles/detail/<int:id>', views.mobile_detail, name="detailmobiles"),
-    path('mobiles/remove/<int:id>',views.mobile_remove,name="removemobiles")
+    path('mobiles/remove/<int:id>',views.mobile_remove,name="removemobiles"),
 
 ]
